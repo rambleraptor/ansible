@@ -52,6 +52,7 @@ options:
             - How often (in seconds) to send a health check. The default value
               is 5 seconds.
         required: false
+        default: 5
         aliases: [check_interval_seconds]
     description:
         description:
@@ -214,7 +215,7 @@ def main():
     module = GcpModule(
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'absent'], type='str'),
-            check_interval_sec=dict(type='int', aliases=['check_interval_seconds']),
+            check_interval_sec=dict(default=5, type='int', aliases=['check_interval_seconds']),
             description=dict(type='str'),
             healthy_threshold=dict(type='int'),
             host=dict(type='str'),
