@@ -76,7 +76,8 @@ options:
         required: false
     region:
         description:
-            - A reference to Region resource.
+            - URL of the region where the regional address resides.
+            - This field is not applicable to global addresses.
         required: true
 extends_documentation_fragment: gcp
 '''
@@ -134,7 +135,8 @@ RETURN = '''
         type: list
     region:
         description:
-            - A reference to Region resource.
+            - URL of the region where the regional address resides.
+            - This field is not applicable to global addresses.
         returned: success
         type: str
 '''
