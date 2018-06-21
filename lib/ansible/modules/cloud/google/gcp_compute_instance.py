@@ -770,7 +770,7 @@ RETURN = '''
                 description:
                     - Email address of the service account.
                 returned: success
-                type: bool
+                type: str
             scopes:
                 description:
                     - The list of scopes to be made available for this service account.
