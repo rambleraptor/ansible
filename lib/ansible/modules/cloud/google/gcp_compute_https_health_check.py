@@ -101,6 +101,9 @@ options:
               consecutive failures. The default value is 2.
         required: false
 extends_documentation_fragment: gcp
+notes:
+    - "API Reference: U(https://cloud.google.com/compute/docs/reference/latest/httpsHealthChecks)"
+    - "Adding Health Checks: U(https://cloud.google.com/compute/docs/load-balancing/health-checks#legacy_health_checks)"
 '''
 
 EXAMPLES = '''
