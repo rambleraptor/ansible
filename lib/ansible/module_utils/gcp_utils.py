@@ -129,12 +129,20 @@ class GcpSession(object):
         return AuthorizedSession(
             self._credentials())
 
-    def _validate(self):
+    @staticmethod
+    def missing_libraries():
+        libraries = []
         if not HAS_REQUESTS:
-            self.module.fail_json(msg="Please install the requests library")
+            libraries.append('requests')
 
         if not HAS_GOOGLE_LIBRARIES:
-            self.module.fail_json(msg="Please install the google-auth library")
+            libraries.append('google-auth')
+
+        return libraries
+
+    def _validate(self):
+        for library in self.missing_libraries():
+            self.module.fail_json(msg="Please install the %s library" % library)
 
         if self.module.params.get('service_account_email') is not None and self.module.params['auth_kind'] != 'machineaccount':
             self.module.fail_json(
