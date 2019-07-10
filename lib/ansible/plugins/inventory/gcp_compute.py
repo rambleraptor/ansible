@@ -252,56 +252,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self.display.warning("Could not set host info hostvar for %s, skipping %s: %s" % (hostname, key, to_text(e)))
         self.inventory.add_child('all', hostname)
 
-    def _get_hostname(self, item):
-        '''
-            :param item: A host response from GCP
-            :return the hostname of this instance
-        '''
-        hostname_ordering = ['public_ip', 'private_ip', 'name']
-        if self.get_option('hostnames'):
-            hostname_ordering = self.get_option('hostnames')
-
-        for order in hostname_ordering:
-            name = None
-            if order == 'public_ip':
-                name = self._get_publicip(item)
-            elif order == 'private_ip':
-                name = self._get_privateip(item)
-            elif order == 'name':
-                name = item[u'name']
-            else:
-                raise AnsibleParserError("%s is not a valid hostname precedent" % order)
-
-            if name:
-                return name
-
-        raise AnsibleParserError("No valid name found for host")
-
-    def _get_publicip(self, item):
-        '''
-            :param item: A host response from GCP
-            :return the publicIP of this instance or None
-        '''
-        # Get public IP if exists
-        for interface in item['networkInterfaces']:
-            if 'accessConfigs' in interface:
-                for accessConfig in interface['accessConfigs']:
-                    if 'natIP' in accessConfig:
-                        return accessConfig[u'natIP']
-        return None
-
-    def _get_privateip(self, item):
-        '''
-            :param item: A host response from GCP
-            :return the privateIP of this instance or None
-        '''
-        # Fallback: Get private IP
-        for interface in item[u'networkInterfaces']:
-            if 'networkIP' in interface:
-                return interface[u'networkIP']
-
-
-
     def verify_file(self, path):
         '''
             :param path: the path to the inventory config file
@@ -391,6 +341,54 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._set_composite_vars(self.get_option('compose'), host.__dict__(), hostname)
             self._add_host_to_composed_groups(self.get_option('groups'), host.__dict__(), hostname)
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host.__dict__(), hostname)
+
+    def _get_hostname(self, item):
+        '''
+            :param item: A host response from GCP
+            :return the hostname of this instance
+        '''
+        hostname_ordering = ['public_ip', 'private_ip', 'name']
+        if self.get_option('hostnames'):
+            hostname_ordering = self.get_option('hostnames')
+
+        for order in hostname_ordering:
+            name = None
+            if order == 'public_ip':
+                name = self._get_publicip(item)
+            elif order == 'private_ip':
+                name = self._get_privateip(item)
+            elif order == 'name':
+                name = item[u'name']
+            else:
+                raise AnsibleParserError("%s is not a valid hostname precedent" % order)
+
+            if name:
+                return name
+
+        raise AnsibleParserError("No valid name found for host")
+
+    def _get_publicip(self, item):
+        '''
+            :param item: A host response from GCP
+            :return the publicIP of this instance or None
+        '''
+        # Get public IP if exists
+        for interface in item['networkInterfaces']:
+            if 'accessConfigs' in interface:
+                for accessConfig in interface['accessConfigs']:
+                    if 'natIP' in accessConfig:
+                        return accessConfig[u'natIP']
+        return None
+
+    def _get_privateip(self, item):
+        '''
+            :param item: A host response from GCP
+            :return the privateIP of this instance or None
+        '''
+        # Fallback: Get private IP
+        for interface in item[u'networkInterfaces']:
+            if 'networkIP' in interface:
+                return interface[u'networkIP']
 
 
     def _get_project_disks(self, config_data, query):
